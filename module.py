@@ -1,31 +1,44 @@
-import os, shutil
+import os, ray, pathlib
 from PIL import Image
 
-# Accept the direct parent directory of the images
-def toWebp(path, **kwargs):
-    files = os.listdir(path)
-    images = [file for file in files if file.endswith((('jpg', 'png')))]
-    to_remove = kwargs.get('removeUnrelated', False)
+filelist = []
+imgExtList = [".png", ".jpg", ".webp"]
 
-    # Convert every image (.png, .jpg) to webp format
-    for each in images:
-        filename = each.split(".")[0]
-        img = Image.open(rf'{path}\{each}')
-        img.save(rf'{path}\{filename}.webp', 'webp')
-        print(f'{path}/{each.split(".")[0]}', "Success")
+# function for getting all images in the directory
+def getImages(dir, remove):
+
+    for each in pathlib.Path(dir).iterdir():
+        if each.is_dir():
+            # call itself
+            getImages(each, remove)
+        else:
+            # call convert if is type of img
+            if each.suffixes[-1] in imgExtList:
+                # print(each.stem)
+                # print(dir)
+                filelist.append(each)
+            elif remove:
+                each.unlink()
 
 
-    # After conversion, remove all unrelated (not .webp) files
-    if to_remove:
-        unrelated = [file for file in files if not file.endswith('webp')]
+# function for converting a single image
+def convert(path, ext, remove):
+    oriExt = path.suffixes[-1]
+    oriName = path.stem
+    writeTodir = path.resolve().parent
 
-        for each in unrelated:
-            unrelatedpath = rf'{path}\{each}'
-            print(unrelatedpath, "Deleted")
+    if ext == oriExt.strip("."):
+        print(f"Skipped--{oriName}.{oriExt}")
+        return
 
-            if os.path.isdir(unrelatedpath):
-                shutil.rmtree(unrelatedpath)
-            elif os.path.isfile(unrelatedpath):
-                os.remove(unrelatedpath)
-            else:
-                raise Exception("Invalid path specified")
+    im = Image.open(path)
+    out_filename = f'{oriName}.{ext}'
+    im.save(rf'{writeTodir}\{out_filename}', ext)
+    if remove:
+        path.unlink()
+
+# asynchronous function
+@ray.remote
+def convert_parallel(paths, ext, remove):
+    for path in paths:
+        convert(path, ext, remove)
