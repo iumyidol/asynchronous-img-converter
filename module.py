@@ -13,7 +13,7 @@ def getImages(dir, remove):
             getImages(each, remove)
         else:
             # call convert if is type of img
-            if each.suffixes[-1] in imgExtList:
+            if len(each.suffixes) > 0 and each.suffixes[-1] in imgExtList:
                 # print(each.stem)
                 # print(dir)
                 filelist.append(each)
@@ -28,7 +28,7 @@ def convert(path, ext, remove):
     writeTodir = path.resolve().parent
 
     if ext == oriExt.strip("."):
-        print(f"Skipped--{oriName}.{oriExt}")
+        print(f"Skipped--{oriName}{oriExt}")
         return
 
     im = Image.open(path)

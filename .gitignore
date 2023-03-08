@@ -4,3 +4,6 @@
 .idea/modules.xml
 .idea/Python IMG convertion.iml
 __pycache__/module.cpython-310.pyc
+__pycache__/main.cpython-310.pyc
+.idea/.name
+.idea/vcs.xml
