@@ -2,7 +2,7 @@ import os, ray, pathlib
 from PIL import Image
 
 filelist = []
-imgExtList = [".png", ".jpg", ".webp"]
+imgExtList = [".png", ".jpeg", ".webp", ".jpg"]
 
 # function for getting all images in the directory
 def getImages(dir, remove):
@@ -33,7 +33,9 @@ def convert(path, ext, remove):
 
     im = Image.open(path)
     out_filename = f'{oriName}.{ext}'
-    im.save(rf'{writeTodir}\{out_filename}', ext)
+    print(rf'{writeTodir}\{out_filename} ext = {ext}')
+    # im = im.convert("L")
+    im.save(rf'{writeTodir}\{out_filename}', ext=ext if ext != "jpg" else "jpeg")
     if remove:
         path.unlink()
 

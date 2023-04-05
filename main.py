@@ -43,7 +43,8 @@ while update != "N":
             remove_converted = True if remove_converted == 'Y' else False
 
     while f'.{desired_ext}' not in imgExtList:
-        desired_ext = input("Image extension you desire ? (eg: .png, .jpg, .webp)")
+        desired_ext = input("Image extension you desire ? (eg: .png, .jpeg, .webp)")
+
 
     if update == "Y":
         while not valid_source:
